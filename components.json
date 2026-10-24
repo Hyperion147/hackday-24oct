@@ -21,5 +21,7 @@
   },
   "menuColor": "inverted",
   "menuAccent": "bold",
-  "registries": {}
+  "registries": {
+    "@supabase": "https://supabase.com/ui/r/{name}.json"
+  }
 }
