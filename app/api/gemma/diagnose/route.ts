@@ -106,7 +106,6 @@ function extractJson(raw: string): unknown {
 
 /**
  * Returns a realistic mock {@link DiagnosisResult} used when
- * `GEMINI_API_KEY` is not configured in the environment.
  *
  * @param rootService - The name of the failed root service.
  * @param blastRadius - Downstream services that were impacted.
@@ -167,7 +166,6 @@ function getMockDiagnosis(
  * ```
  *
  * Response: {@link DiagnosisResult} as JSON (200).
- * Falls back to a mock diagnosis when `GEMINI_API_KEY` is not set.
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // ------------------------------------------------------------------
