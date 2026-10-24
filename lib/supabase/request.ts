@@ -3,13 +3,10 @@ import { cookies } from "next/headers"
 import type { ServerCookieAdapter } from "@/lib/supabase/server"
 
 /**
- * Bridge between the Next.js request context and the Supabase server client.
- *
- * This module exists because of a module-graph restriction: `next/headers`
- * (and anything under `next/dist/server/**` reachable from it) must stay out
- * of the files that construct and use Supabase clients — importing both in
- * the same module breaks the Supabase builders' generic inference. Route
- * handlers import this file and pass the adapter into `createClient`.
+ * Bridge between the Next.js request context (`next/headers`) and the Supabase
+ * server client's cookie adapter. Keeping the Next-specific import here means
+ * data-access modules (`lib/supabase/server.ts`, `lib/chaos/*`) stay free of
+ * request-context dependencies and remain trivially unit-testable.
  */
 export async function getServerCookieAdapter(): Promise<ServerCookieAdapter> {
   const cookieStore = await cookies()

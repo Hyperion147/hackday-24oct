@@ -1,24 +1,20 @@
 import {
   createAdminServiceClient,
-  createClient,
   type ServerCookieAdapter,
-  type SupabaseServerClient,
 } from "@/lib/supabase/server"
-import type { ServiceType, ServiceUpdate } from "@/types/database"
+import type { IncidentSeverity, IncidentStatus, ServiceType, ServiceUpdate } from "@/types/database"
 import type {
   ChaosBreakResult,
   ChaosFailure,
   ChaosRecoverResult,
-  IncidentSeverity,
 } from "@/types/chaos-outcome"
 
 /**
  * Chaos simulation domain logic.
  *
- * Deliberately free of `next/*` imports: the Supabase client generics only
- * infer correctly in a module graph that does not include the Next request
- * context (see `lib/supabase/server.ts`). Everything here is plain TypeScript
- * with structured results the HTTP layer maps to status codes.
+ * Plain TypeScript domain logic returning structured results (no `next/*`
+ * imports), which the HTTP layer maps to status codes. Keeps database access
+ * testable outside of a request context.
  */
 
 /* -------------------------------------------------------------------------- */
@@ -59,8 +55,9 @@ const REMEDIATION_PLAYBOOK: Record<ServiceType, string[]> = {
   ],
 }
 
-const OPEN_STATUSES = ["open", "acknowledged"]
-const LADDER: readonly IncidentSeverity[] = ["low", "medium", "high", "critical"]
+/** Incidents that have not yet been resolved (real DB enum: active | resolved). */
+const OPEN_STATUSES: readonly IncidentStatus[] = ["active"]
+const LADDER: readonly IncidentSeverity[] = ["info", "warning", "critical"]
 
 /* -------------------------------------------------------------------------- */
 /*  Graph traversal                                                            */
@@ -102,8 +99,10 @@ function computeBlastRadius(
 }
 
 function severityFor(rootType: ServiceType, impactedCount: number): IncidentSeverity {
+  // Ladder compressed onto the DB enum (info | warning | critical):
+  // ≥2 impacted → critical, 1 → warning, 0 → info.
   const base: IncidentSeverity =
-    impactedCount >= 4 ? "critical" : impactedCount >= 2 ? "high" : impactedCount === 1 ? "medium" : "low"
+    impactedCount >= 2 ? "critical" : impactedCount === 1 ? "warning" : "info"
   const isCriticalInfra = rootType === "database" || rootType === "cache"
   if (isCriticalInfra && base !== "critical") {
     return LADDER[LADDER.indexOf(base) + 1]
@@ -223,7 +222,7 @@ export async function breakService(
       root_service_id: serviceId,
       impacted_service_ids: impactedIds,
       severity,
-      status: "open",
+      status: "active",
       title: `${root.name} is down${impactedIds.length > 0 ? ` — ${impactedIds.length} service${impactedIds.length === 1 ? "" : "s"} impacted` : " (isolated)"}`,
       description: `${root.name} stopped responding to health checks. Cascade detected across: ${impactedNames.length > 0 ? impactedNames.join(", ") : "no dependents"}.`,
       ai_diagnosis: buildDiagnosis(root.name, root.type, impactedNames, severity),
@@ -298,13 +297,4 @@ export async function recoverProject(
   }
 
   return { ok: true, blastRadius: [], resolvedIncidents: resolved?.length ?? 0 }
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Shared helpers re-used by other server code                                */
-/* -------------------------------------------------------------------------- */
-
-/** Convenience factory when another (next-free) module needs a request client. */
-export function makeRequestScopeClient(cookies: ServerCookieAdapter): Promise<SupabaseServerClient> {
-  return createClient(cookies)
 }

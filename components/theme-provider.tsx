@@ -10,8 +10,9 @@ function ThemeProvider({
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="system"
-      enableSystem
+      defaultTheme="light"
+      enableSystem={false}
+      storageKey="stackpulse-theme"
       disableTransitionOnChange
       {...props}
     >

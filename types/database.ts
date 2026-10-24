@@ -6,6 +6,9 @@
  * - `*Insert`   payload for INSERTs (server-defaulted columns omitted)
  * - `*Update`   payload for UPDATEs (all-optional; primary keys excluded)
  *
+ * All shapes are type aliases — see the note above `Database` for why they
+ * must never be re-declared as interfaces.
+ *
  * NOTE: `Incident` / `TelemetryLog` here describe the database rows; the
  * client-side simulation record lives in `types/pulse.ts` and is deliberately
  * kept separate.
@@ -21,15 +24,15 @@ export type ServiceStatus = "healthy" | "degraded" | "down"
 
 export type ServiceRelation = "sync" | "async" | "fallback"
 
-export type IncidentSeverity = "low" | "medium" | "high" | "critical"
+export type IncidentSeverity = "info" | "warning" | "critical"
 
-export type IncidentStatus = "open" | "acknowledged" | "resolved"
+export type IncidentStatus = "active" | "resolved"
 
 /* -------------------------------------------------------------------------- */
 /*  Rows                                                                       */
 /* -------------------------------------------------------------------------- */
 
-export interface Project {
+export type Project = {
   id: string
   name: string
   slug: string
@@ -37,12 +40,12 @@ export interface Project {
   created_at: string
 }
 
-export interface ServicePosition {
+export type ServicePosition = {
   x: number
   y: number
 }
 
-export interface Service {
+export type Service = {
   id: string
   project_id: string
   name: string
@@ -58,7 +61,7 @@ export interface Service {
   position: ServicePosition
 }
 
-export interface ServiceEdge {
+export type ServiceEdge = {
   id: string
   project_id: string
   /** Caller service id (depends on / sends traffic to `target_id`). */
@@ -68,7 +71,7 @@ export interface ServiceEdge {
   relation: ServiceRelation
 }
 
-export interface Incident {
+export type Incident = {
   id: string
   project_id: string
   root_service_id: string
@@ -84,7 +87,7 @@ export interface Incident {
   resolved_at: string | null
 }
 
-export interface TelemetryLog {
+export type TelemetryLog = {
   id: string
   service_id: string
   /** Sample timestamp (timestamptz). */
@@ -98,7 +101,7 @@ export interface TelemetryLog {
 /*  Inserts (primary keys + server defaults omitted)                           */
 /* -------------------------------------------------------------------------- */
 
-export interface ProjectInsert {
+export type ProjectInsert = {
   id?: string
   name: string
   slug: string
@@ -106,7 +109,7 @@ export interface ProjectInsert {
   created_at?: string
 }
 
-export interface ServiceInsert {
+export type ServiceInsert = {
   id?: string
   project_id: string
   name: string
@@ -118,7 +121,7 @@ export interface ServiceInsert {
   position?: ServicePosition
 }
 
-export interface ServiceEdgeInsert {
+export type ServiceEdgeInsert = {
   id?: string
   project_id: string
   source_id: string
@@ -126,7 +129,7 @@ export interface ServiceEdgeInsert {
   relation: ServiceRelation
 }
 
-export interface IncidentInsert {
+export type IncidentInsert = {
   id?: string
   project_id: string
   root_service_id: string
@@ -140,7 +143,7 @@ export interface IncidentInsert {
   resolved_at?: string | null
 }
 
-export interface TelemetryLogInsert {
+export type TelemetryLogInsert = {
   id?: string
   service_id: string
   timestamp?: string
@@ -163,15 +166,28 @@ export type TelemetryLogUpdate = Partial<Omit<TelemetryLogInsert, "id" | "servic
 /*  Database definition                                                        */
 /* -------------------------------------------------------------------------- */
 
-interface TableDefinition<Row, Insert, Update> {
+/**
+ * Table shape: `Row`/`Insert`/`Update` plus the Relationships array Supabase's
+ * generated types always emit (empty here — no FK relations modeled).
+ */
+type TableDefinition<Row, Insert, Update> = {
   Row: Row
   Insert: Insert
   Update: Update
   Relationships: []
 }
 
-/** Public schema definition consumed by the typed Supabase clients. */
-export interface Database {
+/**
+ * Public schema definition consumed by the typed Supabase clients.
+ *
+ * IMPORTANT: every shape in this file is a type ALIAS, never an interface.
+ * Supabase's `Schema extends GenericSchema` check requires `Tables[...].Row`
+ * (and Insert/Update) to be assignable to `Record<string, unknown>`, and only
+ * type aliases receive implicit index signatures — an `interface` fails that
+ * check, the schema resolves to `never`, and every table builder silently
+ * collapses (`.update()` takes `never`, row data loses all properties).
+ */
+export type Database = {
   public: {
     Tables: {
       projects: TableDefinition<Project, ProjectInsert, ProjectUpdate>

@@ -8,6 +8,7 @@ import { ServiceCanvas } from "@/components/canvas/ServiceCanvas"
 import { DiagramUploadModal } from "@/components/canvas/DiagramUploadModal"
 import { IncidentFeed } from "@/components/incidents/IncidentFeed"
 import { TelemetryStrip } from "@/components/telemetry/TelemetryStrip"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -23,11 +24,11 @@ function StatusPill() {
     return (
       <Badge
         variant="outline"
-        className="gap-2 rounded-full border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-300"
+        className="gap-2 rounded-full border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-600"
       >
         <span className="relative flex size-2">
-          <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-50" />
-          <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-50" />
+          <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
         </span>
         All Systems Operational
       </Badge>
@@ -40,8 +41,8 @@ function StatusPill() {
       className={cn(
         "gap-2 rounded-full px-3 py-1.5 text-xs font-medium",
         status === "degraded"
-          ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
-          : "border-red-500/40 bg-red-500/10 text-red-300",
+          ? "border-amber-500/30 bg-amber-500/10 text-amber-600"
+          : "border-red-500/40 bg-red-500/10 text-red-600",
       )}
     >
       <span className="relative flex size-2">
@@ -49,7 +50,7 @@ function StatusPill() {
         <span
           className={cn(
             "relative inline-flex size-2 rounded-full",
-            status === "degraded" ? "bg-amber-400" : "bg-red-500",
+            status === "degraded" ? "bg-amber-500" : "bg-red-500",
           )}
         />
       </span>
@@ -66,18 +67,18 @@ function TopNavbar() {
 
   return (
     <>
-      <header className="flex h-14 shrink-0 items-center gap-4 border-b border-white/10 bg-slate-950/80 px-5 backdrop-blur">
+      <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border bg-background/80 px-5 backdrop-blur">
         <div className="flex items-center gap-2.5">
           <span className="flex size-8 items-center justify-center rounded-lg border border-sky-500/30 bg-sky-500/10 shadow-[0_0_18px_-4px_rgba(56,189,248,0.5)]">
-            <HeartPulse className="size-4 text-sky-400" />
+            <HeartPulse className="size-4 text-sky-500" />
           </span>
           <div className="leading-tight">
-            <h1 className="font-heading text-sm font-semibold tracking-tight text-slate-100">StackPulse</h1>
-            <p className="text-[10px] text-slate-500">API health · architecture · chaos simulation</p>
+            <h1 className="font-heading text-sm font-semibold tracking-tight text-foreground">StackPulse</h1>
+            <p className="text-[10px] text-muted-foreground">API health · architecture · chaos simulation</p>
           </div>
         </div>
 
-        <div className="mx-2 hidden h-6 w-px bg-white/10 sm:block" />
+        <div className="mx-2 hidden h-6 w-px bg-border sm:block" />
 
         <div className="hidden sm:block">
           <StatusPill />
@@ -87,7 +88,7 @@ function TopNavbar() {
           <Button
             variant="outline"
             size="sm"
-            className="gap-1.5 border-violet-500/30 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 hover:text-violet-200"
+            className="gap-1.5 border-violet-500/30 bg-violet-500/10 text-violet-600 hover:bg-violet-500/20 hover:text-violet-700"
             onClick={() => setUploadOpen(true)}
           >
             <Upload data-icon="inline-start" />
@@ -106,6 +107,10 @@ function TopNavbar() {
             <RotateCcw data-icon="inline-start" />
             Reset System
           </Button>
+
+          <div className="mx-1 hidden h-6 w-px bg-border sm:block" />
+
+          <ThemeToggle />
         </div>
       </header>
 
@@ -124,21 +129,21 @@ export default function DashboardPage() {
   }, [tick])
 
   return (
-    <div className="flex h-svh flex-col overflow-hidden bg-slate-950 text-slate-200">
+    <div className="flex h-svh flex-col overflow-hidden bg-background text-foreground">
       <TopNavbar />
 
       <main className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]">
-        <section className="relative min-h-0 border-white/10 xl:border-r">
+        <section className="relative min-h-0 border-border xl:border-r">
           <ReactFlowProvider>
             <ServiceCanvas />
           </ReactFlowProvider>
         </section>
-        <aside className="min-h-0 border-t border-white/10 xl:border-t-0">
+        <aside className="min-h-0 border-t border-border xl:border-t-0">
           <IncidentFeed />
         </aside>
       </main>
 
-      <footer className="h-64 shrink-0 border-t border-white/10">
+      <footer className="h-64 shrink-0 border-t border-border">
         <TelemetryStrip />
       </footer>
     </div>

@@ -40,7 +40,7 @@ function replaceById<T extends { id: string }>(list: T[], row: T): T[] {
 /**
  * Subscribes the dashboard to live topology data for one project.
  *
- * Initial snapshot: `services`, `service_edges`, and active (`open`/`acknowledged`)
+ * Initial snapshot: `services`, `service_edges`, and active (`status = active`)
  * `incidents`. Then a `realtime-topology` channel keeps the feed in sync:
  * - `UPDATE`/`INSERT` on `public.services`  → status + latency updates
  * - `INSERT`/`UPDATE` on `public.incidents` → incident feed updates
@@ -52,21 +52,19 @@ export function useRealtimeTopology(projectId: string): RealtimeTopologyState {
   const [state, setState] = useState<RealtimeTopologyState>(INITIAL_STATE)
   // Guard against setState-from-realtime after unmount or project switch.
   const activeRef = useRef(true)
-  activeRef.current = true
 
   const supabase = useMemo(() => getSupabaseBrowserClient(), [])
 
+  // Validation / configuration problems are derived during render rather than
+  // set inside the effect (avoids synchronous setState during effects).
+  const configError = !projectId
+    ? "projectId is required"
+    : !supabase
+      ? "Supabase is not configured (missing NEXT_PUBLIC_SUPABASE_URL or anon key)"
+      : null
+
   useEffect(() => {
-    if (!projectId) {
-      setState({ ...INITIAL_STATE, loading: false, error: "projectId is required" })
-      return
-    }
-    if (!supabase) {
-      setState({
-        ...INITIAL_STATE,
-        loading: false,
-        error: "Supabase is not configured (missing NEXT_PUBLIC_SUPABASE_URL or anon key)",
-      })
+    if (!supabase || configError) {
       return
     }
 
@@ -153,7 +151,7 @@ export function useRealtimeTopology(projectId: string): RealtimeTopologyState {
         const [servicesResult, edgesResult, incidentsResult] = await Promise.all([
           supabase.from("services").select("*").eq("project_id", projectId).order("name"),
           supabase.from("service_edges").select("*").eq("project_id", projectId),
-          supabase.from("incidents").select("*").eq("project_id", projectId).in("status", ["open", "acknowledged"]),
+          supabase.from("incidents").select("*").eq("project_id", projectId).eq("status", "active"),
         ])
 
         if (!activeRef.current) return
@@ -191,7 +189,10 @@ export function useRealtimeTopology(projectId: string): RealtimeTopologyState {
         void supabase.removeChannel(channel)
       }
     }
-  }, [projectId, supabase])
+  }, [projectId, supabase, configError])
 
+  if (configError) {
+    return { ...INITIAL_STATE, loading: false, error: configError }
+  }
   return state
 }

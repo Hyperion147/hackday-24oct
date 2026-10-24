@@ -228,7 +228,7 @@ export function DiagramUploadModal({ open, onOpenChange }: DiagramUploadModalPro
         {/* Overlay */}
         <DialogPrimitive.Overlay
           className={cn(
-            "fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm",
+            "fixed inset-0 z-50 bg-background/80 backdrop-blur-sm",
             "data-open:animate-in data-open:fade-in-0",
             "data-closed:animate-out data-closed:fade-out-0",
             "duration-150",
@@ -239,7 +239,7 @@ export function DiagramUploadModal({ open, onOpenChange }: DiagramUploadModalPro
         <DialogPrimitive.Content
           className={cn(
             "fixed top-1/2 left-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2",
-            "rounded-xl border border-white/10 bg-slate-900 shadow-2xl",
+            "rounded-xl border border-border bg-card shadow-2xl",
             "flex flex-col gap-0 p-6 outline-none",
             "data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95",
             "data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
@@ -251,7 +251,7 @@ export function DiagramUploadModal({ open, onOpenChange }: DiagramUploadModalPro
             <DialogPrimitive.Title className="text-base font-semibold text-white">
               Import Architecture Diagram
             </DialogPrimitive.Title>
-            <DialogPrimitive.Description className="mt-1 text-sm text-slate-400">
+            <DialogPrimitive.Description className="mt-1 text-sm text-muted-foreground">
               Upload a screenshot or hand-drawn diagram. Gemma&nbsp;4 will parse it into your live
               canvas.
             </DialogPrimitive.Description>
@@ -278,14 +278,14 @@ export function DiagramUploadModal({ open, onOpenChange }: DiagramUploadModalPro
               "transition-colors duration-150 select-none",
               isDragActive
                 ? "border-sky-400/60 bg-sky-500/5"
-                : "border-white/20 hover:border-white/30 hover:bg-white/[0.02]",
+                : "border-border hover:border-foreground/40 hover:bg-muted/30",
             )}
           >
             {/* Icon */}
             <div
               className={cn(
                 "flex size-12 items-center justify-center rounded-full",
-                isDragActive ? "bg-sky-500/15" : "bg-white/5",
+                isDragActive ? "bg-sky-500/15" : "bg-muted/50",
               )}
             >
               <svg
@@ -296,7 +296,7 @@ export function DiagramUploadModal({ open, onOpenChange }: DiagramUploadModalPro
                 strokeWidth={1.5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className={cn("size-6", isDragActive ? "text-sky-400" : "text-slate-400")}
+                className={cn("size-6", isDragActive ? "text-sky-500" : "text-muted-foreground")}
                 aria-hidden="true"
               >
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -307,11 +307,11 @@ export function DiagramUploadModal({ open, onOpenChange }: DiagramUploadModalPro
 
             {/* Label */}
             <div>
-              <p className={cn("text-sm font-medium", isDragActive ? "text-sky-300" : "text-slate-300")}>
+              <p className={cn("text-sm font-medium", isDragActive ? "text-sky-600" : "text-foreground/80")}>
                 {isDragActive ? "Drop to upload" : "Drag & drop your diagram"}
               </p>
-              <p className="mt-0.5 text-xs text-slate-500">
-                or <span className="text-sky-400 underline underline-offset-2">click to browse</span>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                or <span className="text-sky-500 underline underline-offset-2">click to browse</span>
                 &ensp;·&ensp;PNG or JPEG
               </p>
             </div>
@@ -329,7 +329,7 @@ export function DiagramUploadModal({ open, onOpenChange }: DiagramUploadModalPro
 
           {/* Selected file preview */}
           {selectedFile && status !== "success" && (
-            <div className="mt-3 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+            <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -338,18 +338,18 @@ export function DiagramUploadModal({ open, onOpenChange }: DiagramUploadModalPro
                 strokeWidth={1.5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="size-4 shrink-0 text-sky-400"
+                className="size-4 shrink-0 text-sky-500"
                 aria-hidden="true"
               >
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                 <circle cx="8.5" cy="8.5" r="1.5" />
                 <polyline points="21 15 16 10 5 21" />
               </svg>
-              <span className="truncate text-sm text-slate-300">{selectedFile.name}</span>
+              <span className="truncate text-sm text-foreground/80">{selectedFile.name}</span>
               <button
                 type="button"
                 aria-label="Remove selected file"
-                className="ml-auto shrink-0 text-slate-500 transition-colors hover:text-slate-300"
+                className="ml-auto shrink-0 text-muted-foreground transition-colors hover:text-foreground/80"
                 onClick={(e) => {
                   e.stopPropagation()
                   setSelectedFile(null)
@@ -381,7 +381,7 @@ export function DiagramUploadModal({ open, onOpenChange }: DiagramUploadModalPro
                 className={cn(
                   "animate-pulse inline-flex items-center gap-1.5 rounded-full",
                   "border border-violet-500/30 bg-violet-500/10 px-3 py-1",
-                  "text-xs font-medium text-violet-300",
+                  "text-xs font-medium text-violet-600",
                 )}
               >
                 ✦ Gemma 4 is synthesizing your system graph…
@@ -396,7 +396,7 @@ export function DiagramUploadModal({ open, onOpenChange }: DiagramUploadModalPro
                 className={cn(
                   "inline-flex items-center gap-1.5 rounded-full",
                   "border border-emerald-500/30 bg-emerald-500/10 px-3 py-1",
-                  "text-xs font-medium text-emerald-300",
+                  "text-xs font-medium text-emerald-600",
                 )}
               >
                 <svg
@@ -419,7 +419,7 @@ export function DiagramUploadModal({ open, onOpenChange }: DiagramUploadModalPro
 
           {/* Error message */}
           {errorMessage && (
-            <p className="mt-3 text-center text-xs text-red-400">{errorMessage}</p>
+            <p className="mt-3 text-center text-xs text-red-500">{errorMessage}</p>
           )}
 
           {/* Footer actions */}
@@ -429,7 +429,7 @@ export function DiagramUploadModal({ open, onOpenChange }: DiagramUploadModalPro
                 variant="ghost"
                 size="sm"
                 disabled={status === "loading"}
-                className="text-slate-400 hover:text-slate-200"
+                className="text-muted-foreground hover:text-foreground"
               >
                 Cancel
               </Button>

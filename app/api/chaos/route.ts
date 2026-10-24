@@ -22,9 +22,9 @@ import type {
  * Success responses: `{ success: true, blastRadius: string[], incidentId? }`.
  * All errors are `{ success: false, error: string }` with an appropriate status.
  *
- * This file is deliberately thin: Supabase calls live in `lib/chaos/chaos.ts`
- * because the Next request-context module graph must not appear in the same
- * modules that use the Supabase client (see `lib/supabase/server.ts`).
+ * This file is deliberately thin: HTTP concerns (validation, status mapping)
+ * live here, while all database operations live in `lib/chaos/chaos.ts`, with
+ * the request's cookie adapter bridged through `lib/supabase/request.ts`.
  */
 
 /* -------------------------------------------------------------------------- */

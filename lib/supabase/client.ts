@@ -8,11 +8,6 @@ export type SupabaseBrowserClient = SupabaseClient<Database>
 
 let browserClient: SupabaseBrowserClient | null = null
 
-/** True when the browser env vars required by Supabase are present. */
-export function isSupabaseBrowserConfigured(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && resolveAnonKey())
-}
-
 /**
  * Preferred (new) Supabase publishable key, falling back to the classic
  * anon key — both grant the same anonymous, RLS-scoped access.

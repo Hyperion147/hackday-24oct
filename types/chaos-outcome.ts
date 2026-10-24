@@ -1,5 +1,3 @@
-import type { IncidentSeverity } from "@/types/database"
-
 /**
  * Contracts for the chaos simulation API (`POST /api/chaos`) and the domain
  * results its underlying library returns. Kept next to the database types so
@@ -70,6 +68,3 @@ export interface ChaosErrorResponse {
 }
 
 export type ChaosResponse = ChaosBreakResponse | ChaosRecoverResponse | ChaosErrorResponse
-
-/** Severity re-exported for route-level logging needs. */
-export type { IncidentSeverity }

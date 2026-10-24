@@ -20,21 +20,21 @@ import type { ServiceStatus } from "@/types/pulse"
 
 /** Downdetector-style bucket for a single availability sample. */
 function uptimeBarTone(value: number): string {
-  if (value >= 95) return "bg-emerald-400"
-  if (value >= 80) return "bg-amber-400"
+  if (value >= 95) return "bg-emerald-500"
+  if (value >= 80) return "bg-amber-500"
   return "bg-red-500"
 }
 
 const STATUS_DOT: Record<ServiceStatus, string> = {
-  healthy: "bg-emerald-400",
-  degraded: "bg-amber-400",
+  healthy: "bg-emerald-500",
+  degraded: "bg-amber-500",
   down: "bg-red-500",
 }
 
 const STATUS_TEXT: Record<ServiceStatus, string> = {
-  healthy: "text-emerald-300",
-  degraded: "text-amber-300",
-  down: "text-red-300",
+  healthy: "text-emerald-600",
+  degraded: "text-amber-600",
+  down: "text-red-600",
 }
 
 function UptimeBars() {
@@ -48,7 +48,7 @@ function UptimeBars() {
             <span className="relative flex size-2 shrink-0">
               <span className={cn("inline-flex size-2 rounded-full", STATUS_DOT[node.data.status])} />
             </span>
-            <span className="w-44 shrink-0 truncate text-xs text-slate-300">{node.data.name}</span>
+            <span className="w-44 shrink-0 truncate text-xs text-foreground/80">{node.data.name}</span>
             <div
               className="flex min-w-0 flex-1 items-center gap-[2px]"
               role="img"
@@ -92,15 +92,15 @@ function LatencySparkline() {
     <div className="flex h-full gap-4">
       <div className="flex w-28 shrink-0 flex-col justify-center gap-3">
         <div>
-          <p className="text-[11px] text-slate-500">Avg latency</p>
-          <p className="font-mono text-xl font-medium tabular-nums text-sky-300">
+          <p className="text-[11px] text-muted-foreground">Avg latency</p>
+          <p className="font-mono text-xl font-medium tabular-nums text-sky-600">
             {Math.round(current)}
-            <span className="text-xs text-slate-500">ms</span>
+            <span className="text-xs text-muted-foreground">ms</span>
           </p>
         </div>
         <div>
-          <p className="text-[11px] text-slate-500">Session peak</p>
-          <p className="font-mono text-sm font-medium tabular-nums text-slate-300">
+          <p className="text-[11px] text-muted-foreground">Session peak</p>
+          <p className="font-mono text-sm font-medium tabular-nums text-foreground/80">
             {Math.round(peak)}ms
           </p>
         </div>
@@ -146,13 +146,13 @@ export function TelemetryStrip() {
   const degradedCount = nodes.filter((node) => node.data.status !== "healthy").length
 
   const availabilityTone =
-    availability >= 99.5 ? "text-emerald-300" : availability >= 97 ? "text-amber-300" : "text-red-300"
+    availability >= 99.5 ? "text-emerald-600" : availability >= 97 ? "text-amber-600" : "text-red-600"
 
   return (
-    <Card className="gap-3 rounded-none border-x-0 border-b-0 bg-slate-950/60 py-3">
+    <Card className="gap-3 rounded-none border-x-0 border-b-0 bg-background/60 py-3">
       <CardHeader className="px-4">
-        <CardTitle className="flex items-center gap-2 text-sm text-slate-200">
-          <Gauge className="size-4 text-sky-400" />
+        <CardTitle className="flex items-center gap-2 text-sm text-foreground">
+          <Gauge className="size-4 text-sky-500" />
           System Telemetry
         </CardTitle>
         <CardAction>
@@ -160,7 +160,7 @@ export function TelemetryStrip() {
             <p className={cn("font-mono text-2xl leading-none font-semibold tabular-nums", availabilityTone)}>
               {availability.toFixed(2)}%
             </p>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-muted-foreground">
               availability · {degradedCount === 0 ? "all nodes nominal" : `${degradedCount} node(s) impacted`}
             </p>
           </div>

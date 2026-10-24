@@ -6,13 +6,10 @@ import type { Database } from "@/types/database"
 /**
  * Server-side Supabase client utilties.
  *
- * IMPORTANT: this module deliberately does NOT import `next/headers`.
- * Importing the Next request-context module graph alongside the Supabase
- * clients breaks their conditional generic inference (table builders resolve
- * to `never`). The cookie adapter is therefore injected from a separate
- * module (`request.ts`), keeping Supabase call sites in a clean module graph.
- *
- * All Supabase reads/writes belong in files that never import from `next/**`.
+ * Note: this module deliberately does not import `next/headers`. Cookie access
+ * is injected by callers via `ServerCookieAdapter` (bridged in `request.ts`),
+ * which keeps these factories usable from any server context and keeps the
+ * HTTP/request layer out of the data-access layer.
  */
 
 /** Server-side Supabase client bound to the `public` schema. */
@@ -43,19 +40,6 @@ function requireSupabaseUrl(): string {
     throw new SupabaseConfigError("NEXT_PUBLIC_SUPABASE_URL is not set")
   }
   return url
-}
-
-/** True when the server env vars required by Supabase are present. */
-export function isSupabaseServerConfigured(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && resolveSafeAnonKey())
-}
-
-function resolveSafeAnonKey(): string | undefined {
-  return (
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-    undefined
-  )
 }
 
 /** Cookie-access adapter shape expected by `@supabase/ssr` server clients. */

@@ -49,17 +49,17 @@ const STATUS_STYLE: Record<ServiceStatus, StatusStyle> = {
   healthy: {
     border: "border-emerald-400/30",
     glow: "shadow-[0_0_18px_-4px_rgba(52,211,153,0.35)]",
-    dot: "bg-emerald-400",
+    dot: "bg-emerald-500",
     ping: true,
-    text: "text-emerald-300",
+    text: "text-emerald-600",
     label: "Healthy",
   },
   degraded: {
     border: "border-amber-400/50",
     glow: "shadow-[0_0_22px_-2px_rgba(251,191,36,0.45)]",
-    dot: "bg-amber-400",
+    dot: "bg-amber-500",
     ping: true,
-    text: "text-amber-300",
+    text: "text-amber-600",
     label: "Degraded",
   },
   down: {
@@ -67,16 +67,16 @@ const STATUS_STYLE: Record<ServiceStatus, StatusStyle> = {
     glow: "shadow-[0_0_28px_-2px_rgba(239,68,68,0.55)]",
     dot: "bg-red-500",
     ping: false,
-    text: "text-red-300",
+    text: "text-red-600",
     label: "Down",
   },
 }
 
 /** Latency badge colour: green < 50ms, amber < 300ms, red ≥ 300ms. */
 function latencyTone(latencyMs: number): string {
-  if (latencyMs < 50) return "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
-  if (latencyMs < 300) return "bg-amber-500/15 text-amber-300 border-amber-500/30"
-  return "bg-red-500/15 text-red-300 border-red-500/30"
+  if (latencyMs < 50) return "bg-emerald-500/15 text-emerald-600 border-emerald-500/30"
+  if (latencyMs < 300) return "bg-amber-500/15 text-amber-600 border-amber-500/30"
+  return "bg-red-500/15 text-red-600 border-red-500/30"
 }
 
 function ServiceNodeComponent({ id, data, selected }: NodeProps<ServiceFlowNode>) {
@@ -90,32 +90,32 @@ function ServiceNodeComponent({ id, data, selected }: NodeProps<ServiceFlowNode>
   return (
     <div
       className={cn(
-        "w-60 rounded-xl border bg-slate-900/80 backdrop-blur-md transition-shadow duration-500",
+        "w-60 rounded-xl border bg-card/80 backdrop-blur-md transition-shadow duration-500",
         status.border,
         status.glow,
-        selected && "ring-2 ring-sky-400/60",
+        selected && "ring-2 ring-ring",
       )}
     >
       {/* Connection points */}
       <Handle
         type="target"
         position={Position.Left}
-        className="!size-2.5 !border-2 !border-slate-600 !bg-slate-900"
+        className="!size-2.5 !border-2 !border-slate-600 !bg-card"
       />
       <Handle
         type="source"
         position={Position.Right}
-        className="!size-2.5 !border-2 !border-slate-600 !bg-slate-900"
+        className="!size-2.5 !border-2 !border-slate-600 !bg-card"
       />
 
       {/* Header */}
-      <div className="flex items-center gap-2.5 border-b border-white/5 px-3.5 pt-3 pb-2.5">
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
+      <div className="flex items-center gap-2.5 border-b border-border px-3.5 pt-3 pb-2.5">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/50">
           <Icon className={cn("size-4", status.text)} />
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm leading-tight font-medium text-slate-100">{data.name}</p>
-          <p className="text-[11px] leading-tight text-slate-500">{TYPE_LABEL[data.type]}</p>
+          <p className="truncate text-sm leading-tight font-medium text-foreground">{data.name}</p>
+          <p className="text-[11px] leading-tight text-muted-foreground">{TYPE_LABEL[data.type]}</p>
         </div>
         <span className="relative ml-auto flex size-2.5 shrink-0">
           {status.ping && (
@@ -138,7 +138,7 @@ function ServiceNodeComponent({ id, data, selected }: NodeProps<ServiceFlowNode>
         >
           {Math.round(data.latencyMs)}ms
         </Badge>
-        <span className="font-mono text-[11px] tabular-nums text-slate-400">
+        <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
           err {data.errorRate.toFixed(1)}%
         </span>
         <span className={cn("ml-auto text-[11px] font-medium", status.text)}>{status.label}</span>

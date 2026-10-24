@@ -11,6 +11,7 @@ import {
   type Edge,
   type NodeTypes,
 } from "@xyflow/react"
+import { useTheme } from "next-themes"
 import "@xyflow/react/dist/style.css"
 
 import { ServiceNode } from "@/components/canvas/ServiceNode"
@@ -21,10 +22,21 @@ const nodeTypes: NodeTypes = {
   service: ServiceNode,
 }
 
-const EDGE_TONE: Record<ServiceStatus, { stroke: string; animated: boolean }> = {
-  healthy: { stroke: "rgba(148,163,184,0.30)", animated: false },
-  degraded: { stroke: "rgba(251,191,36,0.75)", animated: true },
-  down: { stroke: "rgba(239,68,68,0.85)", animated: true },
+function edgeTone(isDark: boolean): Record<ServiceStatus, { stroke: string; animated: boolean }> {
+  return {
+    healthy: {
+      stroke: isDark ? "rgba(148,163,184,0.30)" : "rgba(100,116,139,0.45)",
+      animated: false,
+    },
+    degraded: {
+      stroke: isDark ? "rgba(251,191,36,0.75)" : "rgba(217,119,6,0.70)",
+      animated: true,
+    },
+    down: {
+      stroke: isDark ? "rgba(239,68,68,0.85)" : "rgba(220,38,38,0.80)",
+      animated: true,
+    },
+  }
 }
 
 /** The worse of two statuses, used for edge colouring. */
@@ -34,16 +46,19 @@ function worstStatus(a: ServiceStatus | undefined, b: ServiceStatus | undefined)
   return "healthy"
 }
 
-const MINIMAP_NODE_COLOR = (node: ServiceFlowNode): string => {
-  if (node.data.status === "down") return "#ef4444"
-  if (node.data.status === "degraded") return "#fbbf24"
-  return "#34d399"
+function minimapNodeColor(node: ServiceFlowNode, isDark: boolean): string {
+  if (node.data.status === "down") return isDark ? "#ef4444" : "#dc2626"
+  if (node.data.status === "degraded") return isDark ? "#fbbf24" : "#d97706"
+  return isDark ? "#34d399" : "#059669"
 }
 
 export function ServiceCanvas() {
   const nodes = usePulseStore((state) => state.nodes)
   const edges = usePulseStore((state) => state.edges)
   const onNodesChange = usePulseStore((state) => state.onNodesChange)
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === "dark"
+  const edgePalette = useMemo(() => edgeTone(isDark), [isDark])
 
   const nodeStatusById = useMemo(
     () => new Map(nodes.map((node) => [node.id, node.data.status])),
@@ -53,7 +68,7 @@ export function ServiceCanvas() {
   const styledEdges = useMemo<ServiceFlowEdge[]>(
     () =>
       edges.map((edge) => {
-        const tone = EDGE_TONE[
+        const tone = edgePalette[
           worstStatus(nodeStatusById.get(edge.source), nodeStatusById.get(edge.target))
         ]
         return {
@@ -62,7 +77,7 @@ export function ServiceCanvas() {
           style: { stroke: tone.stroke, strokeWidth: 2 },
         }
       }),
-    [edges, nodeStatusById],
+    [edges, nodeStatusById, edgePalette],
   )
 
   return (
@@ -73,26 +88,26 @@ export function ServiceCanvas() {
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         fitView
-        fitViewOptions={{ padding: 0.25 }}
-        minZoom={0.4}
-        maxZoom={1.8}
+        fitViewOptions={{ padding: 0.4 }}
+        minZoom={0.25}
+        maxZoom={1.6}
       >
-        <Background variant={BackgroundVariant.Dots} gap={22} size={1.4} color="rgba(148,163,184,0.18)" />
-        <Controls className="!rounded-lg !border !border-white/10 !bg-slate-900/80 [&_button]:!fill-slate-300 [&_button]:!stroke-slate-300 [&_button:hover]:!bg-white/10" />
+        <Background variant={BackgroundVariant.Dots} gap={22} size={1.4} color={isDark ? "rgba(148,163,184,0.18)" : "rgba(100,116,139,0.28)"} />
+        <Controls className="!rounded-lg !border !border-border !bg-card/90 [&_button]:!fill-muted-foreground [&_button]:!stroke-muted-foreground [&_button:hover]:!bg-muted" />
         <MiniMap
           pannable
           zoomable
-          nodeColor={MINIMAP_NODE_COLOR}
-          maskColor="rgba(2,6,23,0.75)"
-          className="!rounded-lg !border !border-white/10 !bg-slate-950/80"
+          nodeColor={(node) => minimapNodeColor(node as ServiceFlowNode, isDark)}
+          maskColor={isDark ? "rgba(2,6,23,0.75)" : "rgba(248,250,252,0.85)"}
+          className="!rounded-lg !border !border-border !bg-background/90"
         />
         <Panel position="top-left">
-          <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-slate-900/70 px-3 py-1.5 text-[11px] text-slate-400 backdrop-blur">
+          <div className="flex items-center gap-3 rounded-lg border border-border bg-card/70 px-3 py-1.5 text-[11px] text-muted-foreground backdrop-blur">
             <span className="flex items-center gap-1.5">
-              <span className="size-2 rounded-full bg-emerald-400" /> Healthy
+              <span className="size-2 rounded-full bg-emerald-500" /> Healthy
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="size-2 rounded-full bg-amber-400" /> Degraded
+              <span className="size-2 rounded-full bg-amber-500" /> Degraded
             </span>
             <span className="flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-red-500" /> Down

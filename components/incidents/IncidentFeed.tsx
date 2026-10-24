@@ -13,10 +13,10 @@ import { usePulseStore } from "@/store/usePulseStore"
 import type { Incident, IncidentSeverity } from "@/types/pulse"
 
 const SEVERITY_TONE: Record<IncidentSeverity, string> = {
-  low: "bg-sky-500/15 text-sky-300 border-sky-500/30",
-  medium: "bg-amber-500/15 text-amber-300 border-amber-500/30",
-  high: "bg-orange-500/15 text-orange-300 border-orange-500/30",
-  critical: "bg-red-500/15 text-red-300 border-red-500/30",
+  low: "bg-sky-500/15 text-sky-600 border-sky-500/30",
+  medium: "bg-amber-500/15 text-amber-600 border-amber-500/30",
+  high: "bg-orange-500/15 text-orange-600 border-orange-500/30",
+  critical: "bg-red-500/15 text-red-600 border-red-500/30",
 }
 
 function IncidentItem({
@@ -32,7 +32,7 @@ function IncidentItem({
     <button
       type="button"
       onClick={onOpen}
-      className="w-full cursor-pointer rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-3 text-left transition-colors hover:border-white/20 hover:bg-white/[0.06]"
+      className="w-full cursor-pointer rounded-lg border border-border bg-muted/30 px-3.5 py-3 text-left transition-colors hover:border-foreground/30 hover:bg-muted/60"
     >
       <div className="flex items-center gap-2">
         <Badge
@@ -41,11 +41,11 @@ function IncidentItem({
         >
           {incident.severity}
         </Badge>
-        <span className="font-mono text-[10px] text-slate-500">{formatRelativeTime(incident.timestamp, now)}</span>
-        <ChevronRight className="ml-auto size-4 text-slate-600" />
+        <span className="font-mono text-[10px] text-muted-foreground">{formatRelativeTime(incident.timestamp, now)}</span>
+        <ChevronRight className="ml-auto size-4 text-muted-foreground/70" />
       </div>
-      <p className="mt-1.5 text-sm leading-snug font-medium text-slate-200">{incident.title}</p>
-      <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-slate-500">{incident.aiDiagnosis}</p>
+      <p className="mt-1.5 text-sm leading-snug font-medium text-foreground">{incident.title}</p>
+      <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-muted-foreground">{incident.aiDiagnosis}</p>
     </button>
   )
 }
@@ -86,16 +86,16 @@ export function IncidentFeed() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
-        <Siren className="size-4 text-red-400" />
-        <h2 className="text-sm font-semibold text-slate-200">Incident Feed</h2>
-        <Badge variant="outline" className="ml-1 rounded-md border-white/15 bg-white/5 px-1.5 py-0 font-mono text-[10px] text-slate-400">
+      <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+        <Siren className="size-4 text-red-500" />
+        <h2 className="text-sm font-semibold text-foreground">Incident Feed</h2>
+        <Badge variant="outline" className="ml-1 rounded-md border-border bg-muted/50 px-1.5 py-0 font-mono text-[10px] text-muted-foreground">
           {incidents.length}
         </Badge>
         <Button
           variant="ghost"
           size="xs"
-          className="ml-auto gap-1 text-violet-300 hover:bg-violet-500/10 hover:text-violet-200"
+          className="ml-auto gap-1 text-violet-600 hover:bg-violet-500/10 hover:text-violet-700"
           onClick={openLatest}
           disabled={incidents.length === 0}
         >
@@ -107,8 +107,8 @@ export function IncidentFeed() {
       {(incidents.length > 0 || unhealthyCount > 0) && (
         <div
           className={cn(
-            "flex items-center gap-2.5 border-b border-white/10 px-4 py-2.5 text-xs",
-            unhealthyCount > 0 ? "bg-red-500/5 text-red-300" : "bg-emerald-500/5 text-emerald-300",
+            "flex items-center gap-2.5 border-b border-border px-4 py-2.5 text-xs",
+            unhealthyCount > 0 ? "bg-red-500/5 text-red-600" : "bg-emerald-500/5 text-emerald-600",
           )}
         >
           <Radio className="size-3.5 shrink-0" />
@@ -123,10 +123,10 @@ export function IncidentFeed() {
       <ScrollArea className="min-h-0 flex-1">
         <div className="space-y-2 p-3">
           {incidents.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-white/10 px-6 py-12 text-center">
-              <ShieldCheck className="size-8 text-emerald-400/70" />
-              <p className="text-sm font-medium text-slate-300">No incidents on record</p>
-              <p className="text-[11px] leading-relaxed text-slate-500">
+            <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border px-6 py-12 text-center">
+              <ShieldCheck className="size-8 text-emerald-500/70" />
+              <p className="text-sm font-medium text-foreground/80">No incidents on record</p>
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
                 Chaos simulation events will generate incidents with AI root-cause analysis here.
               </p>
             </div>
